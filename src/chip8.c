@@ -48,7 +48,6 @@ void chip8_init()
 
 	chip8.delay_timer = 0;
 	chip8.sound_timer = 0;
-
 	chip8.draw_flag = 0x01;
 }
 

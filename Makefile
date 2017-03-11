@@ -1,5 +1,7 @@
+SRC:= src/*
+
 all:
-	gcc emulator.c chip8.c -o emulator -Iinclude `pkg-config --cflags --libs sdl2`
+	gcc $(SRC).c -o emulator -Iinclude `pkg-config --cflags --libs sdl2`
 
 clean:
 	rm emulator
