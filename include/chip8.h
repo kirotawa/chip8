@@ -42,5 +42,6 @@ void chip8_set_keys(void);
 void chip8_display(void);
 void chip8_key_event(void);
 void chip8_instructions_handler(unsigned short);
+void chip8_clear_screen(void);
 
 #endif

@@ -35,9 +35,7 @@ void chip8_init()
 	chip8.SP = 0;
 
 	// clear display, memory, registers, stack, keys
-	for (i = 0; i < 2048; ++i)
-		chip8.gfx[i] = 0;
-
+	chip8_clear_screen();
 	for (i = 0; i < 4096; ++i)
 		chip8.memory[i] = 0;
 
@@ -50,6 +48,15 @@ void chip8_init()
 	chip8.delay_timer = 0;
 	chip8.sound_timer = 0;
 	chip8.draw_flag = 0x01;
+}
+
+void chip8_clear_screen()
+{
+	int i;
+
+	for (i = 0; i < 2048; ++i)
+		chip8.gfx[i] = 0;
+
 }
 
 int chip8_load_game(char *filename)
@@ -146,7 +153,7 @@ void chip8_instructions_handler(unsigned short opcode)
 			if (b2 == 0xEE)
 				chip8.PC = chip8.stack[chip8.SP];
 			if (b2 == 0xE0)
-				;
+				chip8_clear_screen();
 			break;
 
 		case 0x10:
