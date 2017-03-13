@@ -13,7 +13,7 @@
 #define REG_SIZE 16
 #define GFX_RATIO 64*32
 
-#define VY(byte) (byte & 0x0F) >> 4
+#define VY(byte) (byte & 0xF0) >> 4
 #define VX(byte) ((byte & 0xFF00) >> 8) & 0x0F
 #define OPCOND(byte) (byte & 0x0F)
 

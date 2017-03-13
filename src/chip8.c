@@ -127,6 +127,7 @@ void chip8_key_event()
 	;
 }
 
+/* This function handles with all opcode. It's called in every cycle */
 void chip8_instructions_handler(unsigned short opcode)
 {
 	unsigned char b1;
@@ -141,6 +142,7 @@ void chip8_instructions_handler(unsigned short opcode)
 	aux2 = b2;
 	switch (b1) {
 		case 0x00:
+			/* Return instruction */
 			if (b2 == 0xEE)
 				chip8.PC = chip8.stack[chip8.SP];
 			if (b2 == 0xE0)
@@ -148,6 +150,7 @@ void chip8_instructions_handler(unsigned short opcode)
 			break;
 
 		case 0x10:
+			/* goto instructions, jump to the NNN address */
 			chip8.PC = opcode & 0x0FFF;
 			break;
 
@@ -158,29 +161,34 @@ void chip8_instructions_handler(unsigned short opcode)
 			break;
 
 		case 0x30:
+			/* Skip if Vx == NN */
 			b1 = (opcode & 0xFF00) >> 8;
 			if (chip8.V[b1 & 0x0F] == b2)
 				chip8.PC += 2;
 			break;
 
 		case 0x40:
+			/* Skip if Vx != NN */
 			b1 = (opcode & 0xFF00) >> 8;
 			if (chip8.V[b1 & 0x0F] != b2)
 				chip8.PC += 2;
 			break;
 
 		case 0x50:
+			/* Skip if Vx == Vy */
 			b1 = (opcode & 0xFF00) >> 8;
-			if (chip8.V[b1 & 0x0F] == chip8.V[b2 & 0xF0])
+			if (chip8.V[b1 & 0x0F] == chip8.V[VY(b2)])
 				chip8.PC += 2;
 			break;
 
-		case 0x60:
+		case 0x60
+			/* Sets Vx to NN */:
 			b1 = (opcode & 0xFF00) >> 8;
 			chip8.V[b1 & 0x0F] = b2;
 			break;
 
 		case 0x70:
+			/*  Adds NN to Vx  */
 			b1 = (opcode & 0xFF00) >> 8;
 			chip8.V[b1 & 0x0F] += b2;
 			break;
@@ -188,31 +196,37 @@ void chip8_instructions_handler(unsigned short opcode)
 		case 0x80:
 			aux1 = VX(opcode);
 			aux2 = VY(aux2);
+			/* Sets Vx to value of Vy */
 			if (OPCOND(b2) == 0x00) {
 				chip8.V[aux1] = chip8.V[aux2];
 			}
 
+			/* A bitwise OR between Vx | Vy */
 			if (OPCOND(b2) == 0x01) {
 				chip8.V[aux1] = chip8.V[aux1] | chip8.V[aux2];
 			}
 
+			/*  A bitwise AND Vx & Vy */
 			if (OPCOND(b2) == 0x02) {
 				chip8.V[aux1] = chip8.V[aux1] & chip8.V[aux2];
 			}
 
+			/* A XOR operation Vx ^ Vy */
 			if (OPCOND(b2) == 0x03) {
 				chip8.V[aux1] = chip8.V[aux1] ^ chip8.V[aux2];
 
 			}
 
+			/* Add Vy to Vx and set VF flag if there's a carry */
 			if (OPCOND(b2) == 0x04) {
-				if ((chip8.V[aux1] += chip8.V[aux2]) > 0xff)
+				if ((chip8.V[aux1] += chip8.V[aux2]) > 0xFF)
 					chip8.VF = 1;
 				else
 					chip8.VF = 0;
 				chip8.V[aux1] += chip8.V[aux2];
 			}
 
+			/* Sub Vy to Vx and set VF flag if there's a borrow */
 			if (OPCOND(b2) == 0x05) {
 				if (chip8.V[aux2] > chip8.V[aux1])
 					chip8.VF = 0;
@@ -222,6 +236,7 @@ void chip8_instructions_handler(unsigned short opcode)
 				chip8.V[aux1] -= chip8.V[aux2];
 			}
 
+			/* Shift Vx by 1 and set the least significant bit to VF */
 			if (OPCOND(b2) == 0x06) {
 				chip8.VF = chip8.V[aux1] & 0x0001;
 				chip8.V[aux1] = chip8.V[aux1] >> 1;
