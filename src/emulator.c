@@ -16,6 +16,7 @@ int main(int arc, char** argv)
 
 	/* main loop */
 	while(!run) {
+		chip8_cycle();
 		chip8_display();
 		chip8_key_event();
 	}

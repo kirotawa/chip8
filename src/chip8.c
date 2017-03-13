@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <SDL/SDL.h>
 #include "chip8.h"
 
@@ -105,9 +106,11 @@ int chip8_load_game(char *filename)
 	return 0;
 }
 
+/* in each cycle emulator walk PC + 2 getting instructions opcode */
 void chip8_cycle()
 {
-	;
+	chip8.opcode = chip8.memory[chip8.PC] << 8 | chip8.memory[chip8.PC + 1];
+	chip8.PC += 2;
 }
 
 void chip8_set_keys()
@@ -122,4 +125,150 @@ void chip8_display()
 void chip8_key_event()
 {
 	;
+}
+
+void chip8_instructions_handle(unsigned short opcode)
+{
+	unsigned char b1;
+	unsigned char b2;
+	unsigned char aux1;
+	unsigned char aux2;
+
+	b1 = (opcode & 0xF000) >> 8;
+	b2 = (opcode & 0x00FF);
+
+	aux1 = b1;
+	aux2 = b2;
+	switch (b1) {
+		case 0x00:
+			if (b2 == 0xEE)
+				chip8.PC = chip8.stack[chip8.SP];
+			if (b2 == 0xE0)
+				;
+			break;
+		case 0x10:
+			chip8.PC = opcode & 0x0FFF;
+			break;
+		case 0x20:
+			/*  calls subroutine in NNN */
+			chip8.stack[chip8.SP] = chip8.PC;
+			chip8.PC = opcode & 0x0FFF;
+			break;
+
+		case 0x30:
+			b1 = (opcode & 0xFF00) >> 8;
+			if (chip8.V[b1 & 0x0F] == b2)
+				chip8.PC += 2;
+			break;
+		case 0x40:
+			b1 = (opcode & 0xFF00) >> 8;
+			if (chip8.V[b1 & 0x0F] != b2)
+				chip8.PC += 2;
+			break;
+		case 0x50:
+			b1 = (opcode & 0xFF00) >> 8;
+			if (chip8.V[b1 & 0x0F] == chip8.V[b2 & 0xF0])
+				chip8.PC += 2;
+			break;
+		case 0x60:
+			b1 = (opcode & 0xFF00) >> 8;
+			chip8.V[b1 & 0x0F] = b2;
+			break;
+		case 0x70:
+			b1 = (opcode & 0xFF00) >> 8;
+			chip8.V[b1 & 0x0F] += b2;
+			break;
+		case 0x80:
+			aux1 = VX(opcode);
+			aux2 = VY(aux2);
+			if (OPCOND(b2) == 0x00) {
+				chip8.V[aux1] = chip8.V[aux2];
+			}
+
+			if (OPCOND(b2) == 0x01) {
+				chip8.V[aux1] = chip8.V[aux1] | chip8.V[aux2];
+			}
+
+			if (OPCOND(b2) == 0x02) {
+				chip8.V[aux1] = chip8.V[aux1] & chip8.V[aux2];
+			}
+
+			if (OPCOND(b2) == 0x03) {
+				chip8.V[aux1] = chip8.V[aux1] ^ chip8.V[aux2];
+
+			}
+
+			if (OPCOND(b2) == 0x04) {
+				if ((chip8.V[aux1] += chip8.V[aux2]) > 0xff)
+					chip8.VF = 1;
+				else
+					chip8.VF = 0;
+				chip8.V[aux1] += chip8.V[aux2];
+			}
+
+			if (OPCOND(b2) == 0x05) {
+				if (chip8.V[aux2] > chip8.V[aux1])
+					chip8.VF = 0;
+				else
+					chip8.VF = 1;
+
+				chip8.V[aux1] -= chip8.V[aux2];
+			}
+
+			if (OPCOND(b2) == 0x06) {
+				chip8.VF = chip8.V[aux1] & 0x0001;
+				chip8.V[aux1] = chip8.V[aux1] >> 1;
+			}
+
+			/* Sub Vy - Vx and assign the result to Vx */
+			if (OPCOND(b2) == 0x07) {
+				if (chip8.V[aux1] > chip8.V[aux2])
+					chip8.VF = 1;
+				else
+					chip8.VF = 0;
+
+				chip8.V[aux1] = chip8.V[aux2] - chip8.V[aux1];
+			}
+
+			/* Shift left by 1 Vx register */
+			if (OPCOND(b2) == 0x0E) {
+				chip8.VF = (chip8.V[aux1] & 0xF0) >> 7;
+				chip8.V[aux1] = chip8.V[aux1] << 1;
+			}
+			break;
+
+		case 0x90:
+			aux1 = VX(opcode);
+			aux2 = VY(aux2);
+
+			if (chip8.V[aux1] != chip8.V[aux2])
+				chip8.PC += 2;
+			break;
+
+		case 0xA0:
+			chip8.I = opcode & 0x0FFF;
+			break;
+
+		case 0XB0:
+			chip8.PC = chip8.V[0] + (opcode & 0x0FFF);
+			break;
+
+		case 0xC0:
+			aux1 = VX(opcode);
+			srand(time(NULL));
+			aux2 = rand() % 256;
+			chip8.V[aux1] = aux2 & (opcode & 0x0FFF);
+
+			break;
+
+		case 0xD0:
+			/* draws routines */
+			break;
+
+		case 0xE0:
+		case 0xF0:
+
+		default:
+			break;
+	}
 }

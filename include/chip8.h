@@ -13,10 +13,15 @@
 #define REG_SIZE 16
 #define GFX_RATIO 64*32
 
+#define VY(byte) (byte & 0x0F) >> 4
+#define VX(byte) ((byte & 0xFF00) >> 8) & 0x0F
+#define OPCOND(byte) (byte & 0x0F)
+
 struct _chip8 {
 	unsigned short opcode; // 2 bytes opcode 0x0000
-	unsigned char memory[M_SIZE]; // up to 4k - 4096bytes
+	unsigned char memory[M_SIZE]; // up to 4k - 4096 bytes
 	unsigned char V[REG_SIZE]; // 16 registers
+	unsigned char VF; // Flag register
 	unsigned short I; // Index address
 	unsigned short PC; // program counter
 	unsigned char gfx[GFX_RATIO]; //
