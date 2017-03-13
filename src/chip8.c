@@ -127,7 +127,7 @@ void chip8_key_event()
 	;
 }
 
-void chip8_instructions_handle(unsigned short opcode)
+void chip8_instructions_handler(unsigned short opcode)
 {
 	unsigned char b1;
 	unsigned char b2;
@@ -146,9 +146,11 @@ void chip8_instructions_handle(unsigned short opcode)
 			if (b2 == 0xE0)
 				;
 			break;
+
 		case 0x10:
 			chip8.PC = opcode & 0x0FFF;
 			break;
+
 		case 0x20:
 			/*  calls subroutine in NNN */
 			chip8.stack[chip8.SP] = chip8.PC;
@@ -160,24 +162,29 @@ void chip8_instructions_handle(unsigned short opcode)
 			if (chip8.V[b1 & 0x0F] == b2)
 				chip8.PC += 2;
 			break;
+
 		case 0x40:
 			b1 = (opcode & 0xFF00) >> 8;
 			if (chip8.V[b1 & 0x0F] != b2)
 				chip8.PC += 2;
 			break;
+
 		case 0x50:
 			b1 = (opcode & 0xFF00) >> 8;
 			if (chip8.V[b1 & 0x0F] == chip8.V[b2 & 0xF0])
 				chip8.PC += 2;
 			break;
+
 		case 0x60:
 			b1 = (opcode & 0xFF00) >> 8;
 			chip8.V[b1 & 0x0F] = b2;
 			break;
+
 		case 0x70:
 			b1 = (opcode & 0xFF00) >> 8;
 			chip8.V[b1 & 0x0F] += b2;
 			break;
+
 		case 0x80:
 			aux1 = VX(opcode);
 			aux2 = VY(aux2);
