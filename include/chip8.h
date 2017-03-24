@@ -1,6 +1,8 @@
 #ifndef _CHIP8_H
 #define _CHIP8_H
 
+#include <SDL2/SDL.h>
+
 /* Error handles */
 #define ENOROM  23
 #define ENOBUFF 22
@@ -34,8 +36,10 @@ struct _chip8 {
 } chip8;
 
 extern unsigned char chip8_fontset[];
+extern unsigned char chip8_keys[];
 
 void chip8_init(void);
+void chip8_sdl_init(SDL_Window *);
 int  chip8_load_game(char *);
 void chip8_cycle(void);
 void chip8_set_keys(void);

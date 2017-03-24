@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <SDL/SDL.h>
 #include "chip8.h"
 
 
@@ -24,6 +23,8 @@ unsigned char chip8_fontset[] =
 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
+
+unsigned char chip8_keys[] = {0x0};
 
 void chip8_init()
 {
@@ -48,6 +49,22 @@ void chip8_init()
 	chip8.delay_timer = 0;
 	chip8.sound_timer = 0;
 	chip8.draw_flag = 0x01;
+}
+
+void chip8_sdl_init(SDL_Window *screen)
+{
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		printf("error");
+		return;
+	}
+
+	screen = SDL_CreateWindow("Emulator", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
+
+	if (!screen)
+		SDL_Quit();
+
+	SDL_Delay(1000);
+
 }
 
 void chip8_clear_screen()
@@ -118,9 +135,30 @@ void chip8_cycle()
 {
 	chip8.opcode = chip8.memory[chip8.PC] << 8 | chip8.memory[chip8.PC + 1];
 	chip8.PC += 2;
+	chip8_instructions_handler(chip8.opcode);
 }
 
 void chip8_set_keys()
+{
+	SDL_Event event;
+
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_KEYDOWN:
+				break;
+			case SDL_KEYUP:
+				break;
+		}
+	}
+
+}
+
+void chip8_on_key_press()
+{
+	;
+}
+
+void chip8_on_key_release()
 {
 	;
 }
@@ -131,7 +169,7 @@ void chip8_display()
 
 void chip8_key_event()
 {
-	;
+	chip8_set_keys();
 }
 
 /* This function handles with all opcode. It's called in every cycle */

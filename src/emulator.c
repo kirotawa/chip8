@@ -5,6 +5,7 @@
 int main(int arc, char** argv)
 {
 	int run = 0;
+	SDL_Window *screen;
 
 	chip8_init();
 	/*  check if rom was load properly */
@@ -14,6 +15,8 @@ int main(int arc, char** argv)
 				chip8.memory[PG_START + 1]);
 	}
 
+	chip8_sdl_init(screen);
+
 	/* main loop */
 	while(!run) {
 		chip8_cycle();
@@ -21,5 +24,7 @@ int main(int arc, char** argv)
 		chip8_key_event();
 	}
 
+	//TODO: encapsule this on a destroy func handling key input
+	SDL_DestroyWindow(screen);
 	return 0;
 }
