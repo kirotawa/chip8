@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <chip8.h>
+#include "chip8.h"
 
 int main(int arc, char** argv)
 {
