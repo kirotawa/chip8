@@ -4,6 +4,7 @@
 #include "chip8.h"
 
 
+/* fontset bytes loaded follow chip8 specs */
 unsigned char chip8_fontset[] =
 {
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -24,8 +25,11 @@ unsigned char chip8_fontset[] =
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
-unsigned char chip8_keys[] = {0x0};
+/* keys bytes load to zero */
+unsigned char chip8_keys[16] = {0x0};
 
+
+/* Initialize cpu */
 void chip8_init()
 {
 	int i;
@@ -51,6 +55,7 @@ void chip8_init()
 	chip8.draw_flag = 0x01;
 }
 
+/* Init SDL window instance */
 void chip8_sdl_init(SDL_Window *screen)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -64,9 +69,9 @@ void chip8_sdl_init(SDL_Window *screen)
 		SDL_Quit();
 
 	SDL_Delay(1000);
-
 }
 
+/* set screen buffer to 0/cleaning */
 void chip8_clear_screen()
 {
 	int i;
@@ -76,6 +81,7 @@ void chip8_clear_screen()
 
 }
 
+/* load rom/game file to cpu memory */
 int chip8_load_game(char *filename)
 {
 	FILE *fp;
@@ -138,6 +144,7 @@ void chip8_cycle()
 	chip8_instructions_handler(chip8.opcode);
 }
 
+/* set chip8 keys through SDL_keys event handle */
 void chip8_set_keys()
 {
 	SDL_Event event;
