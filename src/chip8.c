@@ -58,17 +58,36 @@ void chip8_init()
 /* Init SDL window instance */
 void chip8_sdl_init(SDL_Window *screen)
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		printf("error");
+	/* just for fun */
+	SDL_Renderer *ren;
+	SDL_Surface *bmp = SDL_LoadBMP("emulator.bmp");
+
+	if (!bmp) {
+		fprintf(stderr, "Error while load presentation image");
 		return;
 	}
 
-	screen = SDL_CreateWindow("Emulator", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		fprintf(stderr, "Error setting SDL Video");
+		return;
+	}
 
-	if (!screen)
+	screen = SDL_CreateWindow("Emulator", 100, 100, 640, 320,
+			SDL_WINDOW_SHOWN);
+
+       	ren = SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
+	SDL_FreeSurface(bmp);
+
+	if (!screen) {
+		fprintf(stderr, "Error while allocate SDL window\n");
 		SDL_Quit();
+	}
 
-	SDL_Delay(1000);
+	SDL_RenderClear(ren);
+	SDL_RenderCopy(ren, tex, NULL, NULL);
+	SDL_RenderPresent(ren);
+//	SDL_Delay(1000);
 }
 
 /* set screen buffer to 0/cleaning */
