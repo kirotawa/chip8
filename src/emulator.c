@@ -5,14 +5,17 @@
 int main(int arc, char** argv)
 {
 	int run = 0;
+	int res = 0;
 	SDL_Window *screen;
 
 	chip8_init();
 	/*  check if rom was load properly */
-	if(!!chip8_load_game(argv[1])) {
-		fprintf(stderr, "Program start wasn't load\n");
-		fprintf(stderr, "Start program equal %x",
+	res = chip8_load_game(argv[1]);
+        if (!!res) {
+		fprintf(stderr, "Program start wasn't load...\n");
+		fprintf(stderr, "Start program equal %x\n",
 				chip8.memory[PG_START + 1]);
+		return res;
 	}
 
 	chip8_sdl_init(screen);

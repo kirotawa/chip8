@@ -112,7 +112,7 @@ int chip8_load_game(char *filename)
 	fp = fopen(filename, "rb");
 
 	if (!fp) {
-		fprintf(stderr, "Could not open game rom\n");
+		fprintf(stderr, "Could not open game rom...\n");
 		return -ENOROM;
 	}
 
@@ -125,7 +125,7 @@ int chip8_load_game(char *filename)
 	buffer = (char *) malloc (sizeof(char) * size);
 
 	if (!buffer) {
-		fprintf(stderr, "Could alloc buffer\n");
+		fprintf(stderr, "Could alloc buffer...\n");
 		return -ENOBUFF;
 	}
 	/* repos pointer file to the begin */
@@ -136,7 +136,7 @@ int chip8_load_game(char *filename)
 	r_buffer = fread(buffer, 1, size, fp);
 
 	if (size != r_buffer) {
-		fprintf(stderr, "Reading error\n");
+		fprintf(stderr, "Reading error...\n");
 		return -EREAD;
 	}
 
@@ -145,7 +145,7 @@ int chip8_load_game(char *filename)
 			chip8.memory[PG_START + i] = buffer[i];
 	}
 	else {
-		fprintf(stderr, "Rom is too big than memory\n");
+		fprintf(stderr, "Rom is too big than memory...\n");
 		return -EBIGROM;
 	}
 
