@@ -15,7 +15,7 @@ int main(int arc, char** argv)
 		fprintf(stderr, "Program start wasn't load...\n");
 		fprintf(stderr, "Start program equal %x\n",
 				chip8.memory[PG_START + 1]);
-		return res;
+		goto error;
 	}
 
 	chip8_sdl_init(screen);
@@ -29,5 +29,7 @@ int main(int arc, char** argv)
 
 	//TODO: encapsule this on a destroy func handling key input
 	SDL_DestroyWindow(screen);
-	return 0;
+
+error:
+	return res;
 }
