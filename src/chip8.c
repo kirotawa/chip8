@@ -112,7 +112,7 @@ int chip8_load_game(char *filename)
 	fp = fopen(filename, "rb");
 
 	if (!fp) {
-		fprintf(stderr, "Could not open game rom");
+		fprintf(stderr, "Could not open game rom\n");
 		return -ENOROM;
 	}
 
