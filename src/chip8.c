@@ -108,12 +108,13 @@ int chip8_load_game(char *filename)
 	char *buffer;
 	size_t r_buffer;
 	int i;
+	int res = 0;
 
 	fp = fopen(filename, "rb");
-
 	if (!fp) {
 		fprintf(stderr, "Could not open game rom...\n");
-		return -ENOROM;
+		res = -ENOROM;
+		goto err_no_rom;
 	}
 
 	/* make point file go to the end */
@@ -126,7 +127,8 @@ int chip8_load_game(char *filename)
 
 	if (!buffer) {
 		fprintf(stderr, "Could alloc buffer...\n");
-		return -ENOBUFF;
+		res = -ENOBUFF;
+		goto err_no_buff;
 	}
 	/* repos pointer file to the begin */
 	fseek(fp, SEEK_SET, 0);
@@ -137,7 +139,8 @@ int chip8_load_game(char *filename)
 
 	if (size != r_buffer) {
 		fprintf(stderr, "Reading error...\n");
-		return -EREAD;
+		res = -EREAD;
+		goto err_read;
 	}
 
 	if ((M_SIZE - PG_START) > size) {
@@ -146,13 +149,17 @@ int chip8_load_game(char *filename)
 	}
 	else {
 		fprintf(stderr, "Rom is too big than memory...\n");
-		return -EBIGROM;
+		res = -EBIGROM;
+		goto err_big_rom;
 	}
 
-	fclose(fp);
+err_read:
+err_big_rom:
 	free(buffer);
-
-	return 0;
+err_no_buff:
+	fclose(fp);
+err_no_rom:
+	return res;
 }
 
 /* in each cycle emulator walk PC + 2 getting instructions opcode */
